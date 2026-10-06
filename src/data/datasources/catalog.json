@@ -1,0 +1,94 @@
+[
+  {
+    "id": "tears-of-steel",
+    "title": "Tears of Steel",
+    "subtitle": "Ciencia ficción · 2012 · 12 min",
+    "description": "Un grupo de científicos intenta salvar el mundo de un ejército de robots en una Ámsterdam futurista. HLS con subtítulos WebVTT en cinco idiomas.",
+    "url": "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel-wvtt.ism/.m3u8",
+    "format": "hls",
+    "category": "vod",
+    "featured": true,
+    "tags": ["Subtítulos", "ABR", "WebVTT"],
+    "artwork": { "poster": "tos-poster", "backdrop": "tos-backdrop", "colors": ["#1F3A5F", "#0B1220"] }
+  },
+  {
+    "id": "big-buck-bunny",
+    "title": "Big Buck Bunny",
+    "subtitle": "Animación · 2008 · 10 min",
+    "description": "Un conejo enorme y bonachón se venga de tres roedores abusones. VOD HLS con escalera ABR completa.",
+    "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    "format": "hls",
+    "category": "vod",
+    "tags": ["ABR", "1080p"],
+    "artwork": { "poster": "bbb-poster", "backdrop": "bbb-backdrop", "colors": ["#7FB5E6", "#2C4A6B"] }
+  },
+  {
+    "id": "apple-bipbop",
+    "title": "BipBop",
+    "subtitle": "Referencia Apple · fMP4",
+    "description": "Stream de referencia de Apple en fMP4 con varias pistas de audio, subtítulos y closed captions.",
+    "url": "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8",
+    "format": "hls",
+    "category": "vod",
+    "tags": ["fMP4", "Multi-audio", "Subtítulos"],
+    "artwork": { "colors": ["#FF8A3D", "#B4235A"] }
+  },
+  {
+    "id": "angel-one",
+    "title": "Angel One",
+    "subtitle": "Demo Shaka Player",
+    "description": "Clip de demostración de Google Shaka con audio multi-idioma y subtítulos en cuatro idiomas.",
+    "url": "https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/hls.m3u8",
+    "format": "hls",
+    "category": "vod",
+    "tags": ["Multi-audio", "Subtítulos"],
+    "artwork": { "colors": ["#34D399", "#0E5A63"] }
+  },
+  {
+    "id": "redbull-tv",
+    "title": "Red Bull TV",
+    "subtitle": "Deportes extremos 24/7",
+    "description": "Canal lineal en directo distribuido por Akamai. Ideal para observar la latencia respecto al borde del directo.",
+    "url": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8",
+    "format": "hls",
+    "category": "live",
+    "live": true,
+    "tags": ["Directo", "Akamai"],
+    "artwork": { "colors": ["#E11D48", "#1E1B4B"] }
+  },
+  {
+    "id": "unified-live",
+    "title": "Señal de prueba",
+    "subtitle": "Unified Streaming · Live",
+    "description": "Carta de ajuste en directo con reloj sincronizado: perfecta para medir la latencia glass-to-glass.",
+    "url": "https://demo.unified-streaming.com/k8s/live/stable/live.isml/.m3u8",
+    "format": "hls",
+    "category": "live",
+    "live": true,
+    "tags": ["Directo", "Test card"],
+    "artwork": { "colors": ["#7C5CFF", "#0F766E"] }
+  },
+  {
+    "id": "envivio-dash",
+    "title": "Envivio MPEG-DASH",
+    "subtitle": "Manifiesto MPD",
+    "description": "Solo Android: ExoPlayer/Media3 reproduce DASH de forma nativa, AVPlayer en iOS no.",
+    "url": "https://dash.akamaized.net/envivio/EnvivioDash3/manifest.mpd",
+    "format": "dash",
+    "category": "lab",
+    "tags": ["DASH"],
+    "artwork": { "colors": ["#2EC5FF", "#1E3A8A"] },
+    "platforms": ["android"]
+  },
+  {
+    "id": "broken-stream",
+    "title": "Stream roto",
+    "subtitle": "HTTP 404",
+    "description": "Manifiesto inexistente para comprobar el manejo de errores, el reintento y el reporte a Crashlytics.",
+    "url": "https://test-streams.mux.dev/does-not-exist/index.m3u8",
+    "format": "hls",
+    "category": "lab",
+    "tags": ["Error"],
+    "artwork": { "colors": ["#F43F5E", "#4C0519"] }
+  }
+]
