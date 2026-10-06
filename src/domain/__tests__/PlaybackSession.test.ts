@@ -9,7 +9,10 @@ function run(signals: PlayerSignal[], start = startSession('s1', 0)) {
   return signals.reduce<{ session: PlaybackSession; events: string[] }>(
     (acc, signal) => {
       const result = advanceSession(acc.session, signal);
-      return { session: result.session, events: [...acc.events, ...result.events.map((e) => e.name)] };
+      return {
+        session: result.session,
+        events: [...acc.events, ...result.events.map((e) => e.name)],
+      };
     },
     { session: start, events: [] },
   );

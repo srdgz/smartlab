@@ -1,6 +1,7 @@
 import { FlatList, StyleSheet, View } from 'react-native';
 
 import type { Stream } from '../../../domain/entities/Stream';
+import { useLayout } from '../../hooks/useLayout';
 import { spacing } from '../../theme/tokens';
 import { SectionHeader } from '../molecules/SectionHeader';
 
@@ -13,6 +14,8 @@ interface StreamRailProps {
 }
 
 export function StreamRail({ title, caption, live, streams, renderItem }: StreamRailProps) {
+  const { insetLeft, insetRight } = useLayout();
+
   if (streams.length === 0) return null;
 
   return (
@@ -24,7 +27,7 @@ export function StreamRail({ title, caption, live, streams, renderItem }: Stream
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => renderItem(item)}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, { paddingLeft: insetLeft, paddingRight: insetRight }]}
         decelerationRate="fast"
       />
     </View>
@@ -33,5 +36,5 @@ export function StreamRail({ title, caption, live, streams, renderItem }: Stream
 
 const styles = StyleSheet.create({
   container: { gap: spacing.md },
-  list: { paddingHorizontal: spacing.lg, gap: spacing.md },
+  list: { gap: spacing.md },
 });

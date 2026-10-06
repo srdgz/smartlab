@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Animated, Platform, RefreshControl, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getContainer } from '../../di/container';
 import { isStreamSupported, type Stream } from '../../domain/entities/Stream';
 import { AppText } from '../components/atoms/AppText';
+import { channelCardWidth, posterCardWidth } from '../components/molecules/cardSizes';
 import { ChannelCard } from '../components/molecules/ChannelCard';
 import { LabStreamRow } from '../components/molecules/LabStreamRow';
 import { PosterCard } from '../components/molecules/PosterCard';
@@ -16,10 +16,14 @@ import { CatalogSkeleton } from '../components/organisms/CatalogSkeleton';
 import { HeroBanner } from '../components/organisms/HeroBanner';
 import { StreamRail } from '../components/organisms/StreamRail';
 import { useAsync } from '../hooks/useAsync';
+import { useLayout } from '../hooks/useLayout';
 import { colors, spacing } from '../theme/tokens';
 
+const HEADER_HEIGHT = 56;
+
 export function CatalogScreen() {
-  const insets = useSafeAreaInsets();
+  const layout = useLayout();
+  const { insets, insetLeft, insetRight, breakpoint } = layout;
   const { getCatalog, analytics, catalogRepository } = getContainer();
   const load = useCallback(
     ({ refresh }: { refresh: boolean }) => getCatalog.execute({ refresh }),
@@ -38,7 +42,10 @@ export function CatalogScreen() {
   }, [analytics]);
 
   const open = (stream: Stream) => {
-    analytics.track({ name: 'open_stream', params: { stream_id: stream.id, category: stream.category } });
+    analytics.track({
+      name: 'open_stream',
+      params: { stream_id: stream.id, category: stream.category },
+    });
     router.push({ pathname: '/player/[id]', params: { id: stream.id } });
   };
 
@@ -60,12 +67,12 @@ export function CatalogScreen() {
 
   if (state.status === 'error') {
     return (
-      <View style={[styles.screen, { paddingTop: insets.top + 56 }]}>
+      <View style={[styles.screen, { paddingTop: insets.top + HEADER_HEIGHT }]}>
         <StatusMessage
           icon="cloud-offline-outline"
-          title="No hemos podido cargar el catálogo"
+          title="We couldn't load the catalog"
           message={state.error.message}
-          actionLabel="Reintentar"
+          actionLabel="Retry"
           onAction={retry}
         />
         {header}
@@ -74,6 +81,9 @@ export function CatalogScreen() {
   }
 
   const { featured, live, vod, lab } = state.data;
+  const labColumns = breakpoint === 'compact' ? 1 : 2;
+  const channelWidth = channelCardWidth(layout);
+  const posterWidth = posterCardWidth(breakpoint);
 
   return (
     <View style={styles.screen}>
@@ -88,45 +98,54 @@ export function CatalogScreen() {
             refreshing={state.refreshing}
             onRefresh={refresh}
             tintColor={colors.text}
-            progressViewOffset={insets.top + 48}
+            progressViewOffset={insets.top + HEADER_HEIGHT}
           />
         }
       >
-        {featured ? <HeroBanner stream={featured} onPlay={() => open(featured)} /> : <View style={{ height: insets.top + 64 }} />}
+        {featured ? (
+          <HeroBanner stream={featured} onPlay={() => open(featured)} />
+        ) : (
+          <View style={{ height: insets.top + HEADER_HEIGHT }} />
+        )}
 
         <StreamRail
-          title="En directo"
-          caption="Canales lineales HLS"
+          title="Live"
+          caption="Linear HLS channels"
           live
           streams={live}
-          renderItem={(stream) => <ChannelCard stream={stream} onPress={() => open(stream)} />}
+          renderItem={(stream) => (
+            <ChannelCard stream={stream} width={channelWidth} onPress={() => open(stream)} />
+          )}
         />
 
         <StreamRail
-          title="Bajo demanda"
-          caption="VOD con ABR, multi-audio y subtítulos"
+          title="On demand"
+          caption="VOD with ABR, multi-audio and subtitles"
           streams={vod}
-          renderItem={(stream) => <PosterCard stream={stream} onPress={() => open(stream)} />}
+          renderItem={(stream) => (
+            <PosterCard stream={stream} width={posterWidth} onPress={() => open(stream)} />
+          )}
         />
 
         {lab.length > 0 && (
           <View style={styles.lab}>
-            <SectionHeader title="Laboratorio" caption="Casos técnicos: formatos y errores" />
-            <View style={styles.labList}>
+            <SectionHeader title="Lab" caption="Technical cases: formats and errors" />
+            <View style={[styles.labList, { paddingLeft: insetLeft, paddingRight: insetRight }]}>
               {lab.map((stream) => (
-                <LabStreamRow
-                  key={stream.id}
-                  stream={stream}
-                  supported={isStreamSupported(stream, Platform.OS)}
-                  onPress={() => open(stream)}
-                />
+                <View key={stream.id} style={labColumns === 1 ? styles.labFull : styles.labHalf}>
+                  <LabStreamRow
+                    stream={stream}
+                    supported={isStreamSupported(stream, Platform.OS)}
+                    onPress={() => open(stream)}
+                  />
+                </View>
               ))}
             </View>
           </View>
         )}
 
         <AppText variant="caption" tone="subtle" style={styles.footer}>
-          Catálogo: {catalogRepository.source}
+          Catalog source: {catalogRepository.source}
         </AppText>
       </Animated.ScrollView>
       {header}
@@ -145,6 +164,13 @@ const styles = StyleSheet.create({
   },
   content: { gap: spacing.xl },
   lab: { gap: spacing.md },
-  labList: { gap: spacing.sm, paddingHorizontal: spacing.lg },
+  labList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: spacing.sm,
+  },
+  labFull: { width: '100%' },
+  labHalf: { width: '49.4%' },
   footer: { textAlign: 'center', paddingHorizontal: spacing.lg },
 });

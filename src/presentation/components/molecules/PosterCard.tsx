@@ -20,7 +20,7 @@ export function PosterCard({ stream, onPress, width = 140 }: PosterCardProps) {
     <PressableScale
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Reproducir ${stream.title}`}
+      accessibilityLabel={`Play ${stream.title}`}
       style={[styles.container, { width }]}
     >
       <Artwork artwork={stream.artwork} style={styles.poster}>
@@ -56,7 +56,13 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.border,
   },
-  typographic: { flex: 1, justifyContent: 'flex-end', padding: spacing.md, zIndex: 1, gap: spacing.xs },
+  typographic: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    padding: spacing.md,
+    zIndex: 1,
+    gap: spacing.xs,
+  },
   typoOverline: { color: 'rgba(255,255,255,0.7)' },
   scrim: { position: 'absolute', left: 0, right: 0, bottom: 0, height: '35%' },
   meta: { gap: spacing.xxs },

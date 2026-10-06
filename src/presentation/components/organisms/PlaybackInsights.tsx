@@ -12,22 +12,28 @@ interface PlaybackInsightsProps {
   session: PlaybackSession;
   telemetry: PlayerTelemetry;
   isLive: boolean;
+  columns?: number;
 }
 
 const PHASE: Record<PlaybackPhase, { label: string; color: string }> = {
-  loading: { label: 'Cargando', color: colors.warning },
-  playing: { label: 'Reproduciendo', color: colors.success },
-  paused: { label: 'En pausa', color: colors.textMuted },
+  loading: { label: 'Loading', color: colors.warning },
+  playing: { label: 'Playing', color: colors.success },
+  paused: { label: 'Paused', color: colors.textMuted },
   buffering: { label: 'Rebuffering', color: colors.warning },
   error: { label: 'Error', color: colors.danger },
-  ended: { label: 'Finalizado', color: colors.textMuted },
+  ended: { label: 'Ended', color: colors.textMuted },
 };
 
 function bitrateOf(track: PlayerTelemetry['videoTrack']) {
   return track?.averageBitrate ?? track?.peakBitrate ?? null;
 }
 
-export function PlaybackInsights({ session, telemetry, isLive }: PlaybackInsightsProps) {
+export function PlaybackInsights({
+  session,
+  telemetry,
+  isLive,
+  columns = 2,
+}: PlaybackInsightsProps) {
   const { videoTrack } = telemetry;
   const phase = PHASE[session.phase];
   const ladder = [...telemetry.videoTracks]
@@ -46,34 +52,59 @@ export function PlaybackInsights({ session, telemetry, isLive }: PlaybackInsight
       </View>
 
       <View style={styles.grid}>
-        <MetricTile icon="flash-outline" label="Arranque" hint="TTFF" value={formatMs(session.startupMs)} accent={colors.primary} />
+        <MetricTile
+          icon="flash-outline"
+          label="Startup"
+          hint="TTFF"
+          columns={columns}
+          value={formatMs(session.startupMs)}
+          accent={colors.primary}
+        />
         <MetricTile
           icon="hourglass-outline"
           label="Rebuffers"
+          columns={columns}
           hint={formatMs(session.rebufferMs)}
           value={String(session.rebufferCount)}
           accent={session.rebufferCount > 0 ? colors.warning : colors.success}
         />
         <MetricTile
           icon="tv-outline"
-          label="Resolución"
+          label="Resolution"
+          columns={columns}
           value={videoTrack ? `${videoTrack.size.height}p` : '—'}
           hint={videoTrack ? `${videoTrack.size.width}×${videoTrack.size.height}` : undefined}
           accent={colors.cyan}
         />
-        <MetricTile icon="speedometer-outline" label="Bitrate" value={formatBitrate(bitrateOf(videoTrack))} accent={colors.cyan} />
-        <MetricTile icon="layers-outline" label="Buffer por delante" value={`${telemetry.bufferAhead.toFixed(1)} s`} accent={colors.success} />
+        <MetricTile
+          icon="speedometer-outline"
+          label="Bitrate"
+          columns={columns}
+          value={formatBitrate(bitrateOf(videoTrack))}
+          accent={colors.cyan}
+        />
+        <MetricTile
+          icon="layers-outline"
+          label="Buffer ahead"
+          columns={columns}
+          value={`${telemetry.bufferAhead.toFixed(1)} s`}
+          accent={colors.success}
+        />
         {isLive ? (
           <MetricTile
             icon="radio-outline"
-            label="Latencia al directo"
-            value={telemetry.offsetFromLive !== null ? `${telemetry.offsetFromLive.toFixed(1)} s` : '—'}
+            label="Live latency"
+            columns={columns}
+            value={
+              telemetry.offsetFromLive !== null ? `${telemetry.offsetFromLive.toFixed(1)} s` : '—'
+            }
             accent={colors.live}
           />
         ) : (
           <MetricTile
             icon="time-outline"
-            label="Posición"
+            label="Position"
+            columns={columns}
             value={formatTime(telemetry.currentTime)}
             hint={formatTime(telemetry.duration)}
             accent={colors.textMuted}
@@ -84,14 +115,18 @@ export function PlaybackInsights({ session, telemetry, isLive }: PlaybackInsight
       {ladder.length > 0 && (
         <View style={styles.ladder}>
           <AppText variant="overline" tone="muted" uppercase>
-            Escalera ABR · {ladder.length} renditions
+            ABR ladder · {ladder.length} renditions
           </AppText>
           {ladder.map((track) => {
             const active = videoTrack?.id === track.id;
             const ratio = Math.max(0.06, (bitrateOf(track) ?? 0) / maxBitrate);
             return (
               <View key={track.id} style={styles.rung}>
-                <AppText variant="caption" tone={active ? 'default' : 'subtle'} style={styles.rungLabel}>
+                <AppText
+                  variant="caption"
+                  tone={active ? 'default' : 'subtle'}
+                  style={styles.rungLabel}
+                >
                   {track.size.height}p
                 </AppText>
                 <View style={styles.barTrack}>
@@ -106,7 +141,11 @@ export function PlaybackInsights({ session, telemetry, isLive }: PlaybackInsight
                     <View style={[styles.bar, styles.barIdle, { width: `${ratio * 100}%` }]} />
                   )}
                 </View>
-                <AppText variant="caption" tone={active ? 'default' : 'subtle'} style={styles.rungValue}>
+                <AppText
+                  variant="caption"
+                  tone={active ? 'default' : 'subtle'}
+                  style={styles.rungValue}
+                >
                   {formatBitrate(bitrateOf(track))}
                 </AppText>
               </View>
@@ -135,7 +174,13 @@ const styles = StyleSheet.create({
   rung: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   rungLabel: { width: 48, fontVariant: ['tabular-nums'] },
   rungValue: { width: 76, textAlign: 'right', fontVariant: ['tabular-nums'] },
-  barTrack: { flex: 1, height: 8, borderRadius: 4, backgroundColor: colors.surfaceRaised, overflow: 'hidden' },
+  barTrack: {
+    flex: 1,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.surfaceRaised,
+    overflow: 'hidden',
+  },
   bar: { height: '100%', borderRadius: 4 },
   barIdle: { backgroundColor: colors.borderStrong },
 });

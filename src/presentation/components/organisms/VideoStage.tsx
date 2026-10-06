@@ -34,9 +34,9 @@ export function VideoStage({ player, session, onRetry }: VideoStageProps) {
           <StatusMessage
             compact
             icon="cloud-offline-outline"
-            title="No se pudo reproducir el stream"
+            title="This stream could not be played"
             message={session.errorMessage ?? undefined}
-            actionLabel="Reintentar"
+            actionLabel="Retry"
             onAction={onRetry}
           />
         </View>

@@ -8,7 +8,10 @@ export type PlaybackEvent =
 export type AnalyticsEvent =
   | PlaybackEvent
   | { name: 'open_stream'; params: { stream_id: string; category: string } }
-  | { name: 'track_change'; params: { stream_id: string; kind: 'audio' | 'subtitle'; language: string } }
+  | {
+      name: 'track_change';
+      params: { stream_id: string; kind: 'audio' | 'subtitle'; language: string };
+    }
   | { name: 'diagnostics_test'; params: { source: string } };
 
 export interface AnalyticsService {

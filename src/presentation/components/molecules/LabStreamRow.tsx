@@ -24,7 +24,7 @@ export function LabStreamRow({ stream, supported, onPress }: LabStreamRowProps) 
       onPress={onPress}
       disabled={!supported}
       accessibilityRole="button"
-      accessibilityLabel={`Reproducir ${stream.title}`}
+      accessibilityLabel={`Play ${stream.title}`}
       accessibilityState={{ disabled: !supported }}
       style={[styles.row, !supported && styles.disabled]}
     >
@@ -39,7 +39,7 @@ export function LabStreamRow({ stream, supported, onPress }: LabStreamRowProps) 
           <Badge label={stream.format} tone="primary" />
         </View>
         <AppText variant="caption" tone="muted" numberOfLines={2}>
-          {supported ? stream.description : 'No disponible en esta plataforma.'}
+          {supported ? stream.description : 'Not available on this platform.'}
         </AppText>
       </View>
       <Ionicons name="chevron-forward" size={18} color={colors.textSubtle} />
@@ -59,7 +59,13 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   disabled: { opacity: 0.5 },
-  icon: { width: 44, height: 44, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
+  icon: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   body: { flex: 1, gap: spacing.xxs },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   title: { flexShrink: 1 },

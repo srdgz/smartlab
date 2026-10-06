@@ -16,7 +16,10 @@ function trackKey(track: { id?: string; language: string }, index: number) {
   return track.id ?? `${track.language}-${index}`;
 }
 
-function sameTrack(a: { id?: string; language: string } | null, b: { id?: string; language: string } | null) {
+function sameTrack(
+  a: { id?: string; language: string } | null,
+  b: { id?: string; language: string } | null,
+) {
   if (!a || !b) return false;
   return a.id !== undefined && b.id !== undefined ? a.id === b.id : a.language === b.language;
 }
@@ -24,20 +27,22 @@ function sameTrack(a: { id?: string; language: string } | null, b: { id?: string
 export function TrackPanel({ telemetry, onSelectAudio, onSelectSubtitle }: TrackPanelProps) {
   const audioOptions: Option<AudioTrack>[] = telemetry.audioTracks.map((track, index) => ({
     key: trackKey(track, index),
-    label: track.label || formatLanguage(track.language, `Pista ${index + 1}`),
+    label: track.label || formatLanguage(track.language, `Track ${index + 1}`),
     value: track,
   }));
 
   const subtitleOptions: Option<SubtitleTrack | null>[] = [
-    { key: 'off', label: 'Desactivados', value: null },
+    { key: 'off', label: 'Off', value: null },
     ...telemetry.subtitleTracks.map((track, index) => ({
       key: trackKey(track, index),
-      label: track.label || formatLanguage(track.language, `Subtítulo ${index + 1}`),
+      label: track.label || formatLanguage(track.language, `Subtitle ${index + 1}`),
       value: track,
     })),
   ];
 
-  const selectedAudio = audioOptions.find((option) => sameTrack(option.value, telemetry.audioTrack));
+  const selectedAudio = audioOptions.find((option) =>
+    sameTrack(option.value, telemetry.audioTrack),
+  );
   const selectedSubtitle = telemetry.subtitleTrack
     ? subtitleOptions.find((option) => sameTrack(option.value, telemetry.subtitleTrack))
     : subtitleOptions[0];
@@ -51,16 +56,18 @@ export function TrackPanel({ telemetry, onSelectAudio, onSelectSubtitle }: Track
         selectedKey={selectedAudio?.key ?? null}
         onSelect={(option) => onSelectAudio(option.value)}
         emptyLabel={
-          audioOptions.length === 1 ? `Una sola pista: ${audioOptions[0].label}` : 'Pista de audio única'
+          audioOptions.length === 1
+            ? `Single track: ${audioOptions[0].label}`
+            : 'Single audio track'
         }
       />
       <OptionGroup
-        title="Subtítulos"
+        title="Subtitles"
         icon="chatbox-ellipses-outline"
         options={subtitleOptions.length > 1 ? subtitleOptions : []}
         selectedKey={selectedSubtitle?.key ?? null}
         onSelect={(option) => onSelectSubtitle(option.value)}
-        emptyLabel="Este stream no declara subtítulos en el manifiesto"
+        emptyLabel="This stream does not declare subtitles in its manifest"
       />
     </View>
   );

@@ -23,7 +23,9 @@ export function ServiceRow({ icon, title, detail, active }: ServiceRowProps) {
           {detail}
         </AppText>
       </View>
-      <View style={[styles.status, { backgroundColor: active ? colors.success : colors.textSubtle }]} />
+      <View
+        style={[styles.status, { backgroundColor: active ? colors.success : colors.textSubtle }]}
+      />
     </View>
   );
 }

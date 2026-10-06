@@ -21,12 +21,15 @@ export class RemoteCatalogDataSource implements CatalogDataSource {
         signal: controller.signal,
       });
       if (!response.ok) {
-        throw new CatalogError(`El servidor respondió con un error (${response.status})`, response.status);
+        throw new CatalogError(
+          `The server responded with an error (${response.status})`,
+          response.status,
+        );
       }
       return await response.json();
     } catch (error) {
       if (error instanceof CatalogError) throw error;
-      throw new CatalogError('No se pudo conectar con el servidor');
+      throw new CatalogError('Could not reach the server');
     } finally {
       clearTimeout(timer);
     }

@@ -10,7 +10,7 @@ export class CatalogError extends Error {
 
 export class StreamNotFoundError extends Error {
   constructor(readonly streamId: string) {
-    super('Este contenido no existe o ya no está disponible.');
+    super('This title does not exist or is no longer available.');
     this.name = 'StreamNotFoundError';
   }
 }

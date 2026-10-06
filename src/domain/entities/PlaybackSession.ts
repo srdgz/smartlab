@@ -14,7 +14,12 @@ export interface PlaybackSession {
 }
 
 export type PlayerSignal =
-  | { type: 'status'; status: 'idle' | 'loading' | 'readyToPlay' | 'error'; at: number; error?: string }
+  | {
+      type: 'status';
+      status: 'idle' | 'loading' | 'readyToPlay' | 'error';
+      at: number;
+      error?: string;
+    }
   | { type: 'playing'; isPlaying: boolean; at: number }
   | { type: 'ended'; at: number }
   | { type: 'reset'; at: number };
@@ -47,7 +52,7 @@ export function advanceSession(session: PlaybackSession, signal: PlayerSignal): 
 
     case 'status': {
       if (signal.status === 'error') {
-        const message = signal.error ?? 'Error desconocido';
+        const message = signal.error ?? 'Unknown error';
         return {
           session: { ...session, phase: 'error', errorMessage: message, bufferingSince: null },
           events: [{ name: 'playback_error', params: { stream_id, message } }],
@@ -85,7 +90,10 @@ export function advanceSession(session: PlaybackSession, signal: PlayerSignal): 
         };
       }
       if (session.phase === 'buffering') return { session, events: [] };
-      return { session: { ...session, phase: signal.isPlaying ? 'playing' : 'paused' }, events: [] };
+      return {
+        session: { ...session, phase: signal.isPlaying ? 'playing' : 'paused' },
+        events: [],
+      };
     }
 
     case 'ended':

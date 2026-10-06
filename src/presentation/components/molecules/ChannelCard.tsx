@@ -19,14 +19,14 @@ export function ChannelCard({ stream, onPress, width = 260 }: ChannelCardProps) 
     <PressableScale
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Ver ${stream.title} en directo`}
+      accessibilityLabel={`Watch ${stream.title} live`}
       style={{ width }}
     >
       <Artwork artwork={stream.artwork} kind="backdrop" style={styles.card}>
         <View style={styles.glow} />
         <View style={styles.content}>
           <View style={styles.top}>
-            <Badge label="En directo" tone="live" />
+            <Badge label="Live" tone="live" />
             <Ionicons name="radio-outline" size={22} color="rgba(255,255,255,0.85)" />
           </View>
           <View style={styles.bottom}>

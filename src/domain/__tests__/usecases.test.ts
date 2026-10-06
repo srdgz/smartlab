@@ -51,7 +51,11 @@ describe('GetStream', () => {
 
 describe('ReportPlaybackEvent', () => {
   function setup() {
-    const analytics = { provider: 'test', track: jest.fn(), screen: jest.fn() } satisfies AnalyticsService;
+    const analytics = {
+      provider: 'test',
+      track: jest.fn(),
+      screen: jest.fn(),
+    } satisfies AnalyticsService;
     const crashReporter = {
       provider: 'test',
       canCrash: false,

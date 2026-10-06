@@ -12,7 +12,6 @@ const firebasePlugins: ExpoConfig['plugins'] = firebaseEnabled
   ? [
       '@react-native-firebase/app',
       '@react-native-firebase/crashlytics',
-      '@react-native-firebase/messaging',
       ['@react-native-firebase/analytics', { ios: { withoutAdIdSupport: true } }],
       ['expo-build-properties', { ios: { useFrameworks: 'dynamic' } }],
     ]
@@ -42,7 +41,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       monochromeImage: './assets/android-icon-monochrome.png',
     },
     predictiveBackGestureEnabled: false,
-    permissions: ['android.permission.POST_NOTIFICATIONS'],
     ...(hasAndroidFirebase && { googleServicesFile: androidServicesFile }),
   },
   web: {
@@ -53,7 +51,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-router',
     'expo-image',
     'expo-font',
-    ['expo-splash-screen', { backgroundColor: '#07080C', image: './assets/splash-icon.png', imageWidth: 160 }],
+    [
+      'expo-splash-screen',
+      { backgroundColor: '#07080C', image: './assets/splash-icon.png', imageWidth: 160 },
+    ],
     ...firebasePlugins,
   ],
   extra: {

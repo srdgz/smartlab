@@ -10,11 +10,23 @@ interface MetricTileProps {
   value: string;
   hint?: string;
   accent?: string;
+  columns?: number;
 }
 
-export function MetricTile({ icon, label, value, hint, accent = colors.primary }: MetricTileProps) {
+export function MetricTile({
+  icon,
+  label,
+  value,
+  hint,
+  accent = colors.primary,
+  columns = 2,
+}: MetricTileProps) {
   return (
-    <View style={styles.tile} accessible accessibilityLabel={`${label}: ${value}`}>
+    <View
+      style={[styles.tile, { flexBasis: `${Math.floor(100 / columns) - 4}%` }]}
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+    >
       <View style={[styles.icon, { backgroundColor: `${accent}22` }]}>
         <Ionicons name={icon} size={16} color={accent} />
       </View>
@@ -30,7 +42,6 @@ export function MetricTile({ icon, label, value, hint, accent = colors.primary }
 
 const styles = StyleSheet.create({
   tile: {
-    flexBasis: '47%',
     flexGrow: 1,
     gap: spacing.xs,
     padding: spacing.md,

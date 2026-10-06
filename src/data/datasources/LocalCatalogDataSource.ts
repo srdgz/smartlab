@@ -2,7 +2,7 @@ import type { CatalogDataSource } from './CatalogDataSource';
 import seed from './catalog.json';
 
 export class LocalCatalogDataSource implements CatalogDataSource {
-  readonly name = 'Local (JSON embebido)';
+  readonly name = 'Local (bundled JSON)';
 
   constructor(private readonly latencyMs = 600) {}
 

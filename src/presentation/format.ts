@@ -22,7 +22,7 @@ export function formatMs(ms: number | null): string {
 export function formatLanguage(code: string | undefined, fallback: string): string {
   if (!code) return fallback;
   try {
-    const name = new Intl.DisplayNames(['es'], { type: 'language' }).of(code);
+    const name = new Intl.DisplayNames(['en'], { type: 'language' }).of(code);
     return name ? name.charAt(0).toUpperCase() + name.slice(1) : fallback;
   } catch {
     return code.toUpperCase();

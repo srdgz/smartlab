@@ -24,22 +24,24 @@ export function StatusMessage({
 }: StatusMessageProps) {
   return (
     <View style={[styles.container, compact && styles.compact]} accessibilityRole="alert">
-      <View style={[styles.icon, compact && styles.iconCompact]}>
-        <Ionicons name={icon} size={compact ? 22 : 30} color={colors.text} />
-      </View>
-      <AppText variant={compact ? 'bodyStrong' : 'headline'} style={styles.center}>
-        {title}
-      </AppText>
-      {message && (
-        <AppText variant="caption" tone="muted" style={styles.center} numberOfLines={3}>
-          {message}
-        </AppText>
-      )}
-      {actionLabel && onAction && (
-        <View style={styles.action}>
-          <Button label={actionLabel} icon="refresh" onPress={onAction} compact />
+      <View style={styles.inner}>
+        <View style={[styles.icon, compact && styles.iconCompact]}>
+          <Ionicons name={icon} size={compact ? 22 : 30} color={colors.text} />
         </View>
-      )}
+        <AppText variant={compact ? 'bodyStrong' : 'headline'} style={styles.center}>
+          {title}
+        </AppText>
+        {message && (
+          <AppText variant="caption" tone="muted" style={styles.center} numberOfLines={3}>
+            {message}
+          </AppText>
+        )}
+        {actionLabel && onAction && (
+          <View style={styles.action}>
+            <Button label={actionLabel} icon="refresh" onPress={onAction} compact />
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -49,10 +51,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
     padding: spacing.xxl,
   },
-  compact: { padding: spacing.lg, gap: spacing.xs },
+  compact: { padding: spacing.lg },
+  inner: { maxWidth: 420, alignItems: 'center', gap: spacing.sm },
   icon: {
     width: 64,
     height: 64,

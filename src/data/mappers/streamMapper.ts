@@ -55,7 +55,7 @@ export function toStream(dto: StreamDto): Stream {
 
 export function toStreams(payload: unknown): Stream[] {
   if (!Array.isArray(payload)) {
-    throw new CatalogError('El catálogo no tiene el formato esperado');
+    throw new CatalogError('The catalog does not have the expected format');
   }
   return payload.filter(isStreamDto).map(toStream);
 }

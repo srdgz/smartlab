@@ -13,7 +13,13 @@ interface ArtworkProps {
   children?: React.ReactNode;
 }
 
-export function Artwork({ artwork, kind = 'poster', position = 'center', style, children }: ArtworkProps) {
+export function Artwork({
+  artwork,
+  kind = 'poster',
+  position = 'center',
+  style,
+  children,
+}: ArtworkProps) {
   const key = kind === 'backdrop' ? (artwork.backdrop ?? artwork.poster) : artwork.poster;
   const source = resolveArtwork(key);
 

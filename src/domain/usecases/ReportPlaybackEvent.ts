@@ -25,7 +25,9 @@ export class ReportPlaybackEvent {
       this.crashReporter.setAttribute('last_stream_id', event.params.stream_id);
     }
     if (event.name === 'playback_error') {
-      this.crashReporter.recordError(new PlaybackError(event.params.stream_id, event.params.message));
+      this.crashReporter.recordError(
+        new PlaybackError(event.params.stream_id, event.params.message),
+      );
     }
   }
 }

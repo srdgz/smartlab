@@ -1,5 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
+import { useLayout } from '../../hooks/useLayout';
 import { spacing } from '../../theme/tokens';
 import { AppText } from '../atoms/AppText';
 import { LiveDot } from '../atoms/LiveDot';
@@ -11,8 +12,10 @@ interface SectionHeaderProps {
 }
 
 export function SectionHeader({ title, caption, live }: SectionHeaderProps) {
+  const { insetLeft, insetRight } = useLayout();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingLeft: insetLeft, paddingRight: insetRight }]}>
       <View style={styles.titleRow}>
         {live && <LiveDot />}
         <AppText variant="headline" accessibilityRole="header">
@@ -29,6 +32,6 @@ export function SectionHeader({ title, caption, live }: SectionHeaderProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { paddingHorizontal: spacing.lg, gap: spacing.xxs },
+  container: { gap: spacing.xxs },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
 });

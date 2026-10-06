@@ -10,7 +10,7 @@ describe('LabStreamRow', () => {
     const onPress = jest.fn();
     await render(<LabStreamRow stream={aStream({ title: 'DASH' })} supported onPress={onPress} />);
 
-    await fireEvent.press(screen.getByLabelText('Reproducir DASH'));
+    await fireEvent.press(screen.getByLabelText('Play DASH'));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
@@ -20,17 +20,17 @@ describe('LabStreamRow', () => {
       <LabStreamRow stream={aStream({ title: 'DASH' })} supported={false} onPress={onPress} />,
     );
 
-    expect(screen.getByText('No disponible en esta plataforma.')).toBeTruthy();
-    await fireEvent.press(screen.getByLabelText('Reproducir DASH'));
+    expect(screen.getByText('Not available on this platform.')).toBeTruthy();
+    await fireEvent.press(screen.getByLabelText('Play DASH'));
     expect(onPress).not.toHaveBeenCalled();
   });
 });
 
 describe('MetricTile', () => {
   it('exposes label and value to screen readers', async () => {
-    await render(<MetricTile icon="flash-outline" label="Arranque" value="820 ms" />);
+    await render(<MetricTile icon="flash-outline" label="Startup" value="820 ms" />);
 
-    expect(screen.getByLabelText('Arranque: 820 ms')).toBeTruthy();
+    expect(screen.getByLabelText('Startup: 820 ms')).toBeTruthy();
   });
 });
 

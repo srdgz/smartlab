@@ -24,6 +24,7 @@ export const gradients = {
   brand: ['#8B6CFF', '#2EC5FF'] as const,
   scrimTop: ['rgba(7,8,12,0.7)', 'rgba(7,8,12,0)'] as const,
   scrimBottom: ['rgba(7,8,12,0)', 'rgba(7,8,12,0.55)', '#07080C'] as const,
+  scrimSide: ['rgba(7,8,12,0.85)', 'rgba(7,8,12,0)'] as const,
   scrimCard: ['rgba(0,0,0,0)', 'rgba(0,0,0,0.85)'] as const,
 };
 

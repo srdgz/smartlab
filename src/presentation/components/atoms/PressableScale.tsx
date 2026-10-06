@@ -1,6 +1,13 @@
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
-import { Animated, Platform, Pressable, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
+import {
+  Animated,
+  Platform,
+  Pressable,
+  type PressableProps,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 
 interface PressableScaleProps extends Omit<PressableProps, 'style'> {
   style?: StyleProp<ViewStyle>;

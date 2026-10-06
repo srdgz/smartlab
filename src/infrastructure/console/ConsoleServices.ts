@@ -1,9 +1,8 @@
 import type { AnalyticsEvent, AnalyticsService } from '../../domain/services/AnalyticsService';
 import type { CrashReporter } from '../../domain/services/CrashReporter';
-import type { PushMessage, PushService, Unsubscribe } from '../../domain/services/PushService';
 
 export class ConsoleAnalytics implements AnalyticsService {
-  readonly provider = 'Consola (modo desarrollo)';
+  readonly provider = 'Console (development)';
 
   track(event: AnalyticsEvent): void {
     if (__DEV__) console.log(`[analytics] ${event.name}`, event.params);
@@ -15,7 +14,7 @@ export class ConsoleAnalytics implements AnalyticsService {
 }
 
 export class ConsoleCrashReporter implements CrashReporter {
-  readonly provider = 'Consola (modo desarrollo)';
+  readonly provider = 'Console (development)';
   readonly canCrash = false;
 
   log(message: string): void {
@@ -31,29 +30,4 @@ export class ConsoleCrashReporter implements CrashReporter {
   }
 
   crash(): void {}
-}
-
-export class UnavailablePushService implements PushService {
-  readonly provider = 'No disponible';
-  readonly isAvailable = false;
-
-  async requestPermission(): Promise<boolean> {
-    return false;
-  }
-
-  async getToken(): Promise<string | null> {
-    return null;
-  }
-
-  onForegroundMessage(_listener: (message: PushMessage) => void): Unsubscribe {
-    return () => {};
-  }
-
-  onMessageOpened(_listener: (message: PushMessage) => void): Unsubscribe {
-    return () => {};
-  }
-
-  async getInitialMessage(): Promise<PushMessage | null> {
-    return null;
-  }
 }

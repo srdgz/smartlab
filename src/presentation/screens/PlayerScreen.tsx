@@ -2,7 +2,6 @@ import { router } from 'expo-router';
 import { useVideoPlayer, type VideoSource } from 'expo-video';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getContainer } from '../../di/container';
 import type { Stream } from '../../domain/entities/Stream';
@@ -15,6 +14,7 @@ import { PlaybackInsights } from '../components/organisms/PlaybackInsights';
 import { TrackPanel } from '../components/organisms/TrackPanel';
 import { VideoStage } from '../components/organisms/VideoStage';
 import { useAsync } from '../hooks/useAsync';
+import { useLayout } from '../hooks/useLayout';
 import { usePlaybackSession } from '../hooks/usePlaybackSession';
 import {
   selectAudioTrack,
@@ -25,6 +25,8 @@ import { colors, spacing } from '../theme/tokens';
 
 type Tab = 'insights' | 'tracks';
 
+const TOP_BAR_HEIGHT = 52;
+
 function toVideoSource(stream: Stream): VideoSource {
   return {
     uri: stream.url,
@@ -34,13 +36,22 @@ function toVideoSource(stream: Stream): VideoSource {
 }
 
 function TopBar({ title }: { title?: string }) {
-  const insets = useSafeAreaInsets();
+  const { insets, gutter } = useLayout();
   return (
-    <View style={[styles.topBar, { paddingTop: insets.top + spacing.xs }]}>
+    <View
+      style={[
+        styles.topBar,
+        {
+          paddingTop: insets.top + spacing.xs,
+          paddingLeft: insets.left + gutter,
+          paddingRight: insets.right + gutter,
+        },
+      ]}
+    >
       <IconButton
         icon="chevron-back"
         size={36}
-        accessibilityLabel="Volver"
+        accessibilityLabel="Back"
         onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
       />
       <AppText variant="bodyStrong" numberOfLines={1} style={styles.topTitle}>
@@ -52,7 +63,7 @@ function TopBar({ title }: { title?: string }) {
 }
 
 function PlayerContent({ stream }: { stream: Stream }) {
-  const insets = useSafeAreaInsets();
+  const { width, height, insets, gutter, splitPlayer, breakpoint } = useLayout();
   const { reportPlaybackEvent, analytics } = getContainer();
   const source = useMemo(() => toVideoSource(stream), [stream]);
   const player = useVideoPlayer(source, (p) => {
@@ -70,59 +81,99 @@ function PlayerContent({ stream }: { stream: Stream }) {
     player.play();
   };
 
+  const availableHeight = height - insets.top - insets.bottom - TOP_BAR_HEIGHT;
+  const videoWidth = splitPlayer
+    ? Math.min((width - insets.left - insets.right) * 0.6, (availableHeight * 16) / 9)
+    : width;
+  const columns = splitPlayer || breakpoint === 'compact' ? 2 : 3;
+
+  const details = (
+    <ScrollView
+      style={splitPlayer ? styles.sidePanel : undefined}
+      contentContainerStyle={[
+        styles.details,
+        {
+          paddingLeft: (splitPlayer ? 0 : insets.left) + gutter,
+          paddingRight: insets.right + gutter,
+          paddingBottom: insets.bottom + spacing.xxl,
+        },
+      ]}
+    >
+      <View style={styles.badges}>
+        {stream.isLive ? <Badge label="Live" tone="live" /> : <Badge label="VOD" tone="glass" />}
+        <Badge label={stream.format} tone="primary" />
+        {stream.tags.map((tag) => (
+          <Badge key={tag} label={tag} />
+        ))}
+      </View>
+      <View style={styles.titleBlock}>
+        <AppText variant="title">{stream.title}</AppText>
+        <AppText variant="caption" tone="subtle">
+          {stream.subtitle}
+        </AppText>
+      </View>
+      <AppText variant="body" tone="muted">
+        {stream.description}
+      </AppText>
+
+      <SegmentedControl<Tab>
+        segments={[
+          { key: 'insights', label: 'Performance' },
+          { key: 'tracks', label: 'Audio & subtitles' },
+        ]}
+        value={tab}
+        onChange={setTab}
+      />
+
+      {tab === 'insights' ? (
+        <PlaybackInsights
+          session={session}
+          telemetry={telemetry}
+          isLive={stream.isLive}
+          columns={columns}
+        />
+      ) : (
+        <TrackPanel
+          telemetry={telemetry}
+          onSelectAudio={(track) => {
+            selectAudioTrack(player, track);
+            analytics.track({
+              name: 'track_change',
+              params: { stream_id: stream.id, kind: 'audio', language: track.language },
+            });
+          }}
+          onSelectSubtitle={(track) => {
+            selectSubtitleTrack(player, track);
+            analytics.track({
+              name: 'track_change',
+              params: {
+                stream_id: stream.id,
+                kind: 'subtitle',
+                language: track?.language ?? 'off',
+              },
+            });
+          }}
+        />
+      )}
+    </ScrollView>
+  );
+
   return (
     <>
       <TopBar title={stream.title} />
-      <VideoStage player={player} session={session} onRetry={retry} />
-      <ScrollView contentContainerStyle={[styles.details, { paddingBottom: insets.bottom + spacing.xxl }]}>
-        <View style={styles.badges}>
-          {stream.isLive ? <Badge label="En directo" tone="live" /> : <Badge label="VOD" tone="glass" />}
-          <Badge label={stream.format} tone="primary" />
-          {stream.tags.map((tag) => (
-            <Badge key={tag} label={tag} />
-          ))}
+      {splitPlayer ? (
+        <View style={styles.split}>
+          <View style={{ width: videoWidth, paddingLeft: insets.left, paddingTop: spacing.sm }}>
+            <VideoStage player={player} session={session} onRetry={retry} />
+          </View>
+          {details}
         </View>
-        <View style={styles.titleBlock}>
-          <AppText variant="title">{stream.title}</AppText>
-          <AppText variant="caption" tone="subtle">
-            {stream.subtitle}
-          </AppText>
-        </View>
-        <AppText variant="body" tone="muted">
-          {stream.description}
-        </AppText>
-
-        <SegmentedControl<Tab>
-          segments={[
-            { key: 'insights', label: 'Rendimiento' },
-            { key: 'tracks', label: 'Audio y subtítulos' },
-          ]}
-          value={tab}
-          onChange={setTab}
-        />
-
-        {tab === 'insights' ? (
-          <PlaybackInsights session={session} telemetry={telemetry} isLive={stream.isLive} />
-        ) : (
-          <TrackPanel
-            telemetry={telemetry}
-            onSelectAudio={(track) => {
-              selectAudioTrack(player, track);
-              analytics.track({
-                name: 'track_change',
-                params: { stream_id: stream.id, kind: 'audio', language: track.language },
-              });
-            }}
-            onSelectSubtitle={(track) => {
-              selectSubtitleTrack(player, track);
-              analytics.track({
-                name: 'track_change',
-                params: { stream_id: stream.id, kind: 'subtitle', language: track?.language ?? 'off' },
-              });
-            }}
-          />
-        )}
-      </ScrollView>
+      ) : (
+        <>
+          <VideoStage player={player} session={session} onRetry={retry} />
+          <View style={styles.flex}>{details}</View>
+        </>
+      )}
     </>
   );
 }
@@ -148,9 +199,9 @@ export function PlayerScreen({ id }: { id: string }) {
           ) : (
             <StatusMessage
               icon="film-outline"
-              title="Contenido no disponible"
+              title="Title unavailable"
               message={state.error.message}
-              actionLabel="Reintentar"
+              actionLabel="Retry"
               onAction={retry}
             />
           )}
@@ -162,18 +213,20 @@ export function PlayerScreen({ id }: { id: string }) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
+  flex: { flex: 1 },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    paddingHorizontal: spacing.md,
     paddingBottom: spacing.sm,
     backgroundColor: colors.black,
   },
   topTitle: { flex: 1, textAlign: 'center' },
   topSpacer: { width: 36 },
   placeholder: { width: '100%', aspectRatio: 16 / 9, backgroundColor: colors.black },
-  details: { padding: spacing.lg, gap: spacing.lg },
+  split: { flex: 1, flexDirection: 'row', gap: spacing.lg },
+  sidePanel: { flex: 1 },
+  details: { paddingTop: spacing.lg, gap: spacing.lg },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
   titleBlock: { gap: spacing.xs },
 });

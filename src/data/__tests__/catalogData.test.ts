@@ -1,5 +1,6 @@
 import { CatalogError } from '../../domain/errors/CatalogError';
 import type { CatalogDataSource } from '../datasources/CatalogDataSource';
+import { FallbackCatalogDataSource } from '../datasources/FallbackCatalogDataSource';
 import { RemoteCatalogDataSource } from '../datasources/RemoteCatalogDataSource';
 import seed from '../datasources/catalog.json';
 import { toStreams } from '../mappers/streamMapper';
@@ -14,11 +15,16 @@ const dto = {
 };
 
 function fakeFetch(response: Partial<Response>) {
-  return jest.fn().mockResolvedValue({ ok: true, status: 200, ...response }) as unknown as typeof fetch;
+  return jest
+    .fn()
+    .mockResolvedValue({ ok: true, status: 200, ...response }) as unknown as typeof fetch;
 }
 
 function sourceReturning(payload: unknown) {
-  return { name: 'fake', fetchStreams: jest.fn().mockResolvedValue(payload) } satisfies CatalogDataSource;
+  return {
+    name: 'fake',
+    fetchStreams: jest.fn().mockResolvedValue(payload),
+  } satisfies CatalogDataSource;
 }
 
 describe('streamMapper', () => {
@@ -51,7 +57,10 @@ describe('streamMapper', () => {
 
 describe('RemoteCatalogDataSource', () => {
   it('surfaces HTTP failures with their status code', async () => {
-    const source = new RemoteCatalogDataSource('https://api.test', fakeFetch({ ok: false, status: 503 }));
+    const source = new RemoteCatalogDataSource(
+      'https://api.test',
+      fakeFetch({ ok: false, status: 503 }),
+    );
 
     await expect(source.fetchStreams()).rejects.toMatchObject({ status: 503 });
   });
@@ -61,9 +70,9 @@ describe('RemoteCatalogDataSource', () => {
       .fn()
       .mockRejectedValue(new TypeError('Network request failed')) as unknown as typeof fetch;
 
-    await expect(new RemoteCatalogDataSource('https://api.test', fetcher).fetchStreams()).rejects.toThrow(
-      'No se pudo conectar con el servidor',
-    );
+    await expect(
+      new RemoteCatalogDataSource('https://api.test', fetcher).fetchStreams(),
+    ).rejects.toThrow('Could not reach the server');
   });
 });
 
@@ -86,5 +95,26 @@ describe('CatalogRepositoryImpl', () => {
     await repository.getStreams({ forceRefresh: true });
 
     expect(source.fetchStreams).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('FallbackCatalogDataSource', () => {
+  it('serves the remote catalog when it is reachable', async () => {
+    const source = new FallbackCatalogDataSource(sourceReturning([dto]), sourceReturning([]));
+
+    await expect(source.fetchStreams()).resolves.toEqual([dto]);
+    expect(source.name).toBe('fake');
+  });
+
+  it('falls back to the bundled catalog when the remote fails', async () => {
+    const remote = {
+      name: 'remote',
+      fetchStreams: jest.fn().mockRejectedValue(new Error('offline')),
+    };
+    const local = { name: 'local', fetchStreams: jest.fn().mockResolvedValue([dto]) };
+    const source = new FallbackCatalogDataSource(remote, local);
+
+    await expect(source.fetchStreams()).resolves.toEqual([dto]);
+    expect(source.name).toBe('local · offline fallback');
   });
 });
