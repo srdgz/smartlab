@@ -1,6 +1,6 @@
 # StreamLab
 
-[![CI](https://github.com/srdgz/streamlab-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/srdgz/streamlab-demo/actions/workflows/ci.yml)
+[![CI](https://github.com/srdgz/smartlab/actions/workflows/ci.yml/badge.svg)](https://github.com/srdgz/smartlab/actions/workflows/ci.yml)
 ![Expo SDK 57](https://img.shields.io/badge/Expo-SDK%2057-000020?logo=expo)
 ![React Native](https://img.shields.io/badge/React%20Native-0.86-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript)
@@ -82,6 +82,8 @@ Escanea el QR con Expo Go. Todo funciona salvo Firebase, que en Expo Go se susti
 | Script | Qué hace |
 |---|---|
 | `npm start` | Servidor de desarrollo de Expo |
+| `npm run android` / `npm run ios` | Abre la app en Expo Go en el emulador o simulador |
+| `npm run android:native` | Compila e instala una build nativa de desarrollo (requiere Android SDK y `ANDROID_HOME`; activa Firebase) |
 | `npm run typecheck` | TypeScript sin emitir |
 | `npm run lint` | ESLint |
 | `npm run format` | Formatea con Prettier |
@@ -89,20 +91,6 @@ Escanea el QR con Expo Go. Todo funciona salvo Firebase, que en Expo Go se susti
 | `npm test` | Tests |
 | `npm run test:coverage` | Tests con informe de cobertura en `coverage/` |
 | `npm run doctor` | Revisa la compatibilidad de dependencias con el SDK |
-
-Variables de entorno opcionales (fichero `.env.local`, ignorado por git):
-
-| Variable | Uso |
-|---|---|
-| `EXPO_PUBLIC_CATALOG_URL` | URL de un catálogo JSON remoto con el mismo formato que `src/data/datasources/catalog.json` |
-
-## Firebase
-
-Necesita una build nativa con EAS. Pasos completos en [docs/firebase.md](docs/firebase.md). En resumen:
-
-1. Crea el proyecto en Firebase Console y una app Android con el paquete `dev.srdgz.streamlab`.
-2. Copia `google-services.json` a la raíz (está en `.gitignore`).
-3. `npx eas-cli@latest build --platform android --profile preview` e instala el APK.
 
 ## Tests
 
